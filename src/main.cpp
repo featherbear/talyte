@@ -69,6 +69,23 @@ void webSocketEvent(WStype_t type, uint8_t* payload, size_t length) {
                 };
 
                 String updateType = json["update-type"];
+
+/*
+    "from-scene": "FROM",
+    "to-scene": "TO",
+    "update-type": "TransitionBegin"
+
+    "from-scene": "FROM",
+    "to-scene": "TO",
+    "update-type": "TransitionVideoEnd"
+
+    "to-scene": "TO",
+    "update-type": "TransitionEnd"
+
+
+
+
+*/
                 if (updateType == "PreviewSceneChanged") {
                     Serial.print("Preview ");
                     Serial.println((const char*)json["scene-name"]);
