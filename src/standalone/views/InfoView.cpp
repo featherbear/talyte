@@ -29,6 +29,6 @@ ViewInterface Info = {
 
         // IP
         M5.Lcd.println((String("IP Address: ") + Device::State.network.ipAddress())); },
-    .handleAltButtonPress = [](bool longPress) { Serial.println("Alt press on info"); },
+    .handleAltButtonPress = [](bool longPress) { Serial.println(longPress ? "Alt long press on info" : "Alt press on info"); },
     .resetState = []() {}};
 }  // namespace ViewInterfaces

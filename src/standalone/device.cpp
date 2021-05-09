@@ -71,14 +71,37 @@ void switchModes() {
     }
 }
 
+uint32_t buttonBPressStart = 0;
+bool buttonBLongPressHandled = false;
+
 void loop() {
     M5.BtnA.read();
     M5.BtnB.read();
 
+    // M5 button pressed
     if (M5.BtnA.wasPressed()) {
         switchModes();
+
+        // Start timer
     } else if (M5.BtnB.wasPressed()) {
-        currentViewInterface.handleAltButtonPress(false);
+        buttonBPressStart = M5.BtnB.lastChange();
+
+        // If side button held for >= 6000ms then trigger the long press event
+    } else if (M5.BtnB.pressedFor(6000) && !buttonBLongPressHandled) {
+        buttonBLongPressHandled = true;
+        currentViewInterface.handleAltButtonPress(true);
+
+        // On short release (<= 1000ms), trigger short press event
+        // On long release, ignore
+    } else if (M5.BtnB.wasReleased()) {
+        bool wasButtonBLongPressHandled = buttonBLongPressHandled;
+        buttonBLongPressHandled = false;
+        if (wasButtonBLongPressHandled) return;
+
+        uint32_t duration = M5.BtnB.lastChange() - buttonBPressStart;
+        if (duration <= 1000) {
+            currentViewInterface.handleAltButtonPress(false);
+        }
     }
 }
 }  // namespace Device
