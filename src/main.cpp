@@ -13,18 +13,24 @@ TalyteClient Talyte;
 
 void setup() {
     Device::setup(ssid, password);
+    Device::link_talyte_instance(&Talyte);
 
     // TODO: Info page - SSID, Server IP, Battery, charging
     // TODO: Shutdown procedure
 
     // event handler
-    Talyte.set_change_event_handler(ChangeEventType::ALL, [](std::string a) {
-       Serial.println("Yeah something happened");
-        return;
+    Talyte.set_change_event_handler(ChangeEventType::ALL, [](String _) {
+        Device::refreshScreen();
     });
+
     Talyte.connect(OBS_HOST, OBS_PORT);
+
+    // TODO: Connecting screen
+    Serial.println("Go to info");
+    Device::setView(View::INFO);
 }
 
 void loop() {
+    Device::loop();
     Talyte.loop();
 }

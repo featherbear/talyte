@@ -17,6 +17,14 @@ String getMACPrefix() {
     return MAC.substring(0, 6);
 }
 
+String getHostname() {
+    return WiFi.getHostname();
+}
+
+String getSSID() {
+    return WiFi.SSID();
+}
+
 void initWiFi(
     const char* ssid, const char* password) {
     WiFi.onEvent(WiFiStationDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);

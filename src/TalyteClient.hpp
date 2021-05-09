@@ -15,7 +15,7 @@ enum ChangeEventType {
     ALL = 0b11
 };
 
-typedef std::function<void(std::string sceneName)> ChangeEventHandler;
+typedef std::function<void(String sceneName)> ChangeEventHandler;
 
 class TalyteClient {
    private:
@@ -27,7 +27,7 @@ class TalyteClient {
    public:
     TalyteClient();
     void loop();
-    void connect(const char* host, int port);
+    void connect(String host, int port);
     TalyteState State;
     void set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler);
 };

@@ -1,6 +1,15 @@
+#ifndef TALYTESTATE_H
+#define TALYTESTATE_H
+
 #include <string>
 
-struct TalyteState {   
-    std::string currentProgram;
-    std::string currentPreview;
+struct TalyteState {
+    TalyteState() {
+        currentPreview = "";
+        currentProgram = "";
+    }
+    String currentProgram;
+    String currentPreview;
 };
+
+#endif

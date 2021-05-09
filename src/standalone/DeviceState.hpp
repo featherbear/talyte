@@ -1,8 +1,9 @@
 #ifndef DEVICESTATE_H
 #define DEVICESTATE_H
 
-#include "enums.hpp"
+#include "../TalyteState.hpp"
 #include "utils/wifi.hpp"
+#include "views/views.hpp"
 
 struct DeviceState {
     enum View currentView;
@@ -11,6 +12,7 @@ struct DeviceState {
             return WifiUtils::getIPAddress();
         }
     } network;
+    struct TalyteState *talyte;
 };
 
 #endif
