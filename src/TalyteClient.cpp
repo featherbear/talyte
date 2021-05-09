@@ -49,10 +49,16 @@ void TalyteClient::webSocketEvent(WStype_t type, uint8_t* payload, size_t length
                 if (updateType == "PreviewSceneChanged") {
                     Serial.print("Preview ");
                     Serial.println((const char*)json["scene-name"]);
+                    if (_previewChangeEventHandler) {
+                        _previewChangeEventHandler(json["scene-name"]);
+                    }
                     break;
                 } else if (updateType == "SwitchScenes") {
                     Serial.print("Switch ");
                     Serial.println((const char*)json["scene-name"]);
+                    if (_programChangeEventHandler) {
+                        _programChangeEventHandler(json["scene-name"]);
+                    }
                 }
 
                 json.clear();
@@ -75,7 +81,7 @@ TalyteClient::TalyteClient() {
     // We can't override the arduino-WebSocket-Client user agent,
     // but we can add a second user agent and cause the sent UA
     // to be turned into a comma separated list???
-    webSocket.setExtraHeaders("User-Agent: Talyte " TALYTE_VERSION); // Hehe macros go brr
+    webSocket.setExtraHeaders("User-Agent: Talyte " TALYTE_VERSION);  // Hehe macros go brr
 
     webSocket.onEvent(std::bind(&TalyteClient::webSocketEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
     webSocket.setReconnectInterval(5000);
@@ -85,8 +91,13 @@ void TalyteClient::loop() {
     webSocket.loop();
 }
 
-void TalyteClient::setup(const char* host, int port) {
+void TalyteClient::connect(const char* host, int port) {
     // TODO: Password support? But will need to add in base64 and SHA256 library... ceebs
 
     webSocket.begin(host, port, "/");
+}
+
+void TalyteClient::set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler) {
+    if (type & ChangeEventType::Program) _programChangeEventHandler = handler;
+    if (type & ChangeEventType::Preview) _previewChangeEventHandler = handler;
 }

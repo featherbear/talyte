@@ -1,11 +1,7 @@
 #include <Arduino.h>
 
-/* Headers? What that */
-// #include "Client.cpp"
-
 #include "TalyteClient.hpp"
 #include "standalone/device.hpp"
-#include "standalone/utils/wifi.hpp"
 //////////////
 
 const char* ssid = "";
@@ -13,20 +9,22 @@ const char* password = "";
 const char* OBS_HOST = "";
 const unsigned short OBS_PORT = 4444;
 
-TalyteClient C;
+TalyteClient Talyte;
 
 void setup() {
-    WifiUtils::initWiFi(ssid, password);
-
-    Device::setup();
+    Device::setup(ssid, password);
 
     // TODO: Info page - SSID, Server IP, Battery, charging
     // TODO: Shutdown procedure
 
     // event handler
-    C.setup(OBS_HOST, OBS_PORT);
+    Talyte.set_change_event_handler(ChangeEventType::ALL, [](std::string a) {
+       Serial.println("Yeah something happened");
+        return;
+    });
+    Talyte.connect(OBS_HOST, OBS_PORT);
 }
 
 void loop() {
-    C.loop();
+    Talyte.loop();
 }

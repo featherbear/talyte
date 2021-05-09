@@ -2,8 +2,9 @@
 
 namespace WifiUtils {
 
-void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info);
 String getMACPrefix();
+String getIPAddress();
 void initWiFi(const char* ssid, const char* password);
+void waitForConnect();
 
 }  // namespace WifiUtils
