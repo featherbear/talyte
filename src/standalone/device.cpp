@@ -17,17 +17,28 @@ void setup(const char* ssid, const char* password) {
     btStop();                // Save power - disable Bluetooth
     Serial.begin(9600);
 
+    Serial.println("Talyte starting...");
+
     M5.Axp.begin();  // Enable battery module
     M5.Axp.ScreenBreath(11);
+    Serial.println("> Battery module initialised");
 
     M5.Lcd.begin();
     M5.Lcd.setRotation(3);
-    refreshScreen(true);
+    Serial.println("> LCD module initialised");
 
+    State.network.requestedSSID = ssid;
     WifiUtils::initWiFi(ssid, password);
-    WifiUtils::waitForConnect();
+    Serial.println("> WiFi module initialised");
 
-    Serial.println(State.network.ipAddress());
+    refreshScreen(true);  // Show the (Connecting) screen
+
+    WifiUtils::waitForConnect();
+    Serial.println("> Connected to " + WifiUtils::getSSID() +
+                   "\n  IP address: " + WifiUtils::getIPAddress() +
+                   "\n  Hostname: " + WifiUtils::getHostname());
+
+    refreshScreen(true);
 }
 
 void link_talyte_instance(TalyteClient* client) {

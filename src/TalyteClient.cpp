@@ -13,12 +13,9 @@ void TalyteClient::webSocketEvent(WStype_t type, uint8_t* payload, size_t length
             break;
         case WStype_CONNECTED:
             Serial.printf("[WSc] Connected to url: %s\n", payload);
-
-            // send message to server when Connected
-            webSocket.sendTXT("Connected");
             break;
         case WStype_TEXT:
-            Serial.printf("[WSc] get text of length %s, %u\n", payload, length);
+            // Serial.printf("[WSc] get text of length %s, %u\n", payload, length);
             {
                 DynamicJsonDocument json = DynamicJsonDocument(length);
                 DeserializationError err = deserializeJson(json, payload);
@@ -31,21 +28,17 @@ void TalyteClient::webSocketEvent(WStype_t type, uint8_t* payload, size_t length
                 String updateType = json["update-type"];
 
                 /*
-    "from-scene": "FROM",
-    "to-scene": "TO",
-    "update-type": "TransitionBegin"
+                    "from-scene": "FROM",
+                    "to-scene": "TO",
+                    "update-type": "TransitionBegin"
 
-    "from-scene": "FROM",
-    "to-scene": "TO",
-    "update-type": "TransitionVideoEnd"
+                    "from-scene": "FROM",
+                    "to-scene": "TO",
+                    "update-type": "TransitionVideoEnd"
 
-    "to-scene": "TO",
-    "update-type": "TransitionEnd"
-
-
-
-
-*/
+                    "to-scene": "TO",
+                    "update-type": "TransitionEnd"
+                */
 
                 if (updateType == "PreviewSceneChanged") {
                     State.currentPreview = (String)(const char*)json["scene-name"];
@@ -77,22 +70,33 @@ void TalyteClient::webSocketEvent(WStype_t type, uint8_t* payload, size_t length
     }
 }
 
-TalyteClient::TalyteClient() {
+TalyteClient::TalyteClient(String host, unsigned short port) {
     // We can't override the arduino-WebSocket-Client user agent,
     // but we can add a second user agent and cause the sent UA
     // to be turned into a comma separated list???
     webSocket.setExtraHeaders("User-Agent: Talyte " TALYTE_VERSION);  // Hehe macros go brr
     webSocket.onEvent(std::bind(&TalyteClient::webSocketEvent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
     webSocket.setReconnectInterval(5000);
+
+    State.network.host = host;
+    State.network.port = port;
 }
 
 void TalyteClient::loop() {
     webSocket.loop();
 }
 
-void TalyteClient::connect(String host, unsigned short port) {
+void TalyteClient::connect() {
     // TODO: Password support? But will need to add in base64 and SHA256 library... ceebs
-    webSocket.begin((State.network.hostname = host), (State.network.port = port), "/");
+    webSocket.begin(State.network.host, State.network.port, "/");
+}
+
+void TalyteClient::waitForConnect() {
+    while (!isConnected()) this->loop();
+}
+
+bool TalyteClient::isConnected() {
+    return webSocket.isConnected();
 }
 
 void TalyteClient::set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler) {

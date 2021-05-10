@@ -17,6 +17,7 @@ struct DeviceState {
         String hostname() {
             return WifiUtils::getHostname();
         }
+        String requestedSSID;
     } network;
     uint8_t getBatteryLevel() {
         // https://community.m5stack.com/post/5841

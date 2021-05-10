@@ -34,11 +34,14 @@ void initWiFi(
 }
 
 void waitForConnect() {
-    while (WiFi.status() != WL_CONNECTED) delay(1000);
+    while (!isConnected()) delay(1000);
 }
 
 String getIPAddress() {
     return WiFi.localIP().toString();
 }
 
+bool isConnected() {
+    return WiFi.status() == WL_CONNECTED;
+}
 }  // namespace WifiUtils

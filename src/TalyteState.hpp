@@ -13,7 +13,7 @@ struct TalyteState {
     String currentPreview;
     String linkedProgram;
     struct {
-        String hostname;
+        String host;
         unsigned short port;
     } network;
 };

@@ -37,7 +37,7 @@ void drawNetwork() {
     M5.Lcd.println("");
 
     // OBS
-    M5.Lcd.println(Spill(String("OBS: ") + talyteState->network.hostname + ":" + String(talyteState->network.port)));
+    M5.Lcd.println(Spill(String("OBS: ") + talyteState->network.host + ":" + String(talyteState->network.port)));
     M5.Lcd.println("");
 
     // Battery

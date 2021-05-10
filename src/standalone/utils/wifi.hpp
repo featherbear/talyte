@@ -8,5 +8,5 @@ String getMACPrefix();
 String getIPAddress();
 void initWiFi(const char* ssid, const char* password);
 void waitForConnect();
-
+bool isConnected();
 }  // namespace WifiUtils

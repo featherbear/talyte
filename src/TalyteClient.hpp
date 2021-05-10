@@ -25,11 +25,13 @@ class TalyteClient {
     ChangeEventHandler _previewChangeEventHandler;
 
    public:
-    TalyteClient();
-    void loop();
-    void connect(String host, unsigned short port);
     TalyteState State;
+    TalyteClient(String host, unsigned short port);
+    void loop();
     void set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler);
+    void connect();
+    void waitForConnect();
+    bool isConnected();
     void setLinkedProgram(String programName);
 };
 

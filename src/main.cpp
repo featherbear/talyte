@@ -9,21 +9,25 @@ const char* password = "YOUR_WIFI_PASSWORD";
 const char* OBS_HOST = "OBS_OR_TALYTE_ASSISTANT_IP";
 const unsigned short OBS_PORT = 4444;
 
-TalyteClient Talyte;
+TalyteClient Talyte(OBS_HOST, OBS_PORT);
 
 void setup() {
-    Device::setup(ssid, password);
-    Device::link_talyte_instance(&Talyte);
-
     // TODO: Shutdown procedure
 
-    // event handler
+    Device::link_talyte_instance(&Talyte);
+    Device::setup(ssid, password);
+
     Talyte.set_change_event_handler(ChangeEventType::ALL, [](String _) {
         Device::refreshScreen();
     });
 
-    // TODO: Wait for Websocket connect???
-    Talyte.connect(OBS_HOST, OBS_PORT);
+Serial.println("Start OBS");
+    Talyte.connect();
+    Talyte.waitForConnect();
+
+    Device::refreshScreen();
+    delay(4000);
+
     Device::setView(View::INFO);
 }
 
