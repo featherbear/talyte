@@ -1,11 +1,18 @@
-// // 6 characters per line
-// #define H1(x) M5.Lcd.setTextSize(4); M5.Lcd.println(x);
+#ifndef VIEWUTILS_H
+#define VIEWUTILS_H
 
-// // 8 characters max
-// #define H2(x) M5.Lcd.setTextSize(3); M5.Lcd.println(x);
+// Size 4 - 6 characters max
+// Size 3 - 8 characters max
+// Size 2 - 13 characters max
 
 #define Title(x)           \
     M5.Lcd.setTextSize(2); \
-    M5.Lcd.println(x);
+    M5.Lcd.println(x);     \
+    M5.Lcd.setTextSize(1);
 
-#define resetFontSize() M5.Lcd.setTextSize(1);
+inline String Spill(String s) {
+    if (s.length() <= 26) return s;
+    return s.substring(0, 23) + "...";
+}
+
+#endif

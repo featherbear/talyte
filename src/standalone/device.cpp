@@ -15,6 +15,8 @@ void setup(const char* ssid, const char* password) {
     btStop();                // Save power - disable Bluetooth
     Serial.begin(9600);
 
+    M5.Axp.begin(); // Enable battery module
+
     M5.Lcd.begin();
     M5.Lcd.setRotation(3);
     refreshScreen(true);
@@ -42,7 +44,6 @@ void setView(enum View view) {
             break;
     }
 
-    resetScreen();
     // currentViewInterface.resetState();
     refreshScreen(true);
 }
@@ -55,6 +56,7 @@ void resetScreen() {
 
 void refreshScreen(bool force) {
     // TODO: check for force
+    resetScreen();
     currentViewInterface.handleDraw();
 }
 

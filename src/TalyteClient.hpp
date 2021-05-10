@@ -27,7 +27,7 @@ class TalyteClient {
    public:
     TalyteClient();
     void loop();
-    void connect(String host, int port);
+    void connect(String host, unsigned short port);
     TalyteState State;
     void set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler);
 };

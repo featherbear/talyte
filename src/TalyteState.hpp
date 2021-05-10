@@ -10,6 +10,10 @@ struct TalyteState {
     }
     String currentProgram;
     String currentPreview;
+    struct {
+        String hostname;
+        unsigned short port;
+    } network;
 };
 
 #endif

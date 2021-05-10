@@ -90,10 +90,9 @@ void TalyteClient::loop() {
     webSocket.loop();
 }
 
-void TalyteClient::connect(String host, int port) {
+void TalyteClient::connect(String host, unsigned short port) {
     // TODO: Password support? But will need to add in base64 and SHA256 library... ceebs
-
-    webSocket.begin(host, port, "/");
+    webSocket.begin((State.network.hostname = host), (State.network.port = port), "/");
 }
 
 void TalyteClient::set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler) {
