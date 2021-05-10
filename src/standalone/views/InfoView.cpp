@@ -15,6 +15,11 @@ static TalyteState *talyteState;
 static bool linkButtonPressed = false;
 
 void drawOBS() {
+    if (!talyteState) {
+        Title("Talyte is not initialised");
+        return;
+    }
+
     // Program
     Title("Program");
     M5.Lcd.println(Spill(talyteState->currentProgram.isEmpty() ? "N/A" : talyteState->currentProgram));
@@ -37,7 +42,11 @@ void drawNetwork() {
     M5.Lcd.println("");
 
     // OBS
-    M5.Lcd.println(Spill(String("OBS: ") + talyteState->network.host + ":" + String(talyteState->network.port)));
+    if (talyteState) {
+        M5.Lcd.println(Spill(String("OBS: ") + talyteState->network.host + ":" + String(talyteState->network.port)));
+    } else {
+        M5.Lcd.println("OBS: Not connected");
+    }
     M5.Lcd.println("");
 
     // Battery
@@ -46,6 +55,11 @@ void drawNetwork() {
 }
 
 void drawAssign() {
+    if (!talyteState) {
+        Title("Talyte is not initialised");
+        return;
+    }
+
     M5.Lcd.println("Assigned program:\n" + Spill("> " + NA_ifEmpty(talyteState->linkedProgram)));
 
     // Linked <> Program
@@ -71,11 +85,6 @@ ViewInterface Info = {
 
             M5.Lcd.println("");
             
-            if (!talyteState) {
-                Title("Talyte is not initialised");
-                return;
-            }
-
             switch (currentPage) {
                 case OBS:
                     drawOBS(); 

@@ -10,10 +10,19 @@ ViewInterface Tally = {
     .handleDraw = []() {
         talyteState = Device::State.talyte;
 
-        Title("Tally");
+        if (!talyteState) {
+            Title("\n\nTalyte is not initialised");
+            return;
+        }
+
+        if (talyteState->linkedProgram == talyteState->currentProgram) {
+            M5.Lcd.fillScreen(RED);
+        } else if (talyteState->linkedProgram == talyteState->currentPreview) {
+            M5.Lcd.fillScreen(GREEN);
+        }
 
         return; },
-    .handleAltButtonPress = [](bool longPress) { Serial.println("Alt press on tally"); },
+    .handleAltButtonPress = [](bool longPress) {},
     .handleAltButtonStateChange = [](bool isPressed) {},
     .resetState = []() {}};
 }  // namespace ViewInterfaces
