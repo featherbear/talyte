@@ -7,9 +7,11 @@ struct TalyteState {
     TalyteState() {
         currentPreview = "";
         currentProgram = "";
+        linkedProgram = "";
     }
     String currentProgram;
     String currentPreview;
+    String linkedProgram;
     struct {
         String hostname;
         unsigned short port;

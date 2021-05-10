@@ -15,4 +15,9 @@ inline String Spill(String s) {
     return s.substring(0, 23) + "...";
 }
 
+inline String NA_ifEmpty(String s) {
+    if (s.isEmpty()) return "N/A";
+    return s;
+}
+
 #endif

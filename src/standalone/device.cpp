@@ -7,6 +7,8 @@ namespace Device {
 struct DeviceState State = {
     .currentView = View::CONNECTING};
 
+bool altButtonEventActive = false;
+
 // Functions to draw
 ViewInterface currentViewInterface = ViewInterfaces::Connecting;
 
@@ -15,7 +17,8 @@ void setup(const char* ssid, const char* password) {
     btStop();                // Save power - disable Bluetooth
     Serial.begin(9600);
 
-    M5.Axp.begin(); // Enable battery module
+    M5.Axp.begin();  // Enable battery module
+    M5.Axp.ScreenBreath(11);
 
     M5.Lcd.begin();
     M5.Lcd.setRotation(3);
@@ -28,6 +31,7 @@ void setup(const char* ssid, const char* password) {
 }
 
 void link_talyte_instance(TalyteClient* client) {
+    State.talyteClient = client;
     State.talyte = &(client->State);
 }
 
@@ -44,7 +48,12 @@ void setView(enum View view) {
             break;
     }
 
-    // currentViewInterface.resetState();
+    currentViewInterface.resetState();
+
+    // Reset alt button states
+    // Otherwise you can hold Alt
+    // and press M5 then release Alt
+    altButtonEventActive = false;
     refreshScreen(true);
 }
 
@@ -74,7 +83,6 @@ void switchModes() {
 }
 
 uint32_t buttonBPressStart = 0;
-bool buttonBLongPressHandled = false;
 
 void loop() {
     M5.BtnA.read();
@@ -86,19 +94,23 @@ void loop() {
 
         // Start timer
     } else if (M5.BtnB.wasPressed()) {
+        altButtonEventActive = true;
         buttonBPressStart = M5.BtnB.lastChange();
+        currentViewInterface.handleAltButtonStateChange(true);
 
         // If side button held for >= 6000ms then trigger the long press event
-    } else if (M5.BtnB.pressedFor(6000) && !buttonBLongPressHandled) {
-        buttonBLongPressHandled = true;
+    } else if (altButtonEventActive && M5.BtnB.pressedFor(6000)) {
+        altButtonEventActive = false;
+
         currentViewInterface.handleAltButtonPress(true);
 
         // On short release (<= 1000ms), trigger short press event
         // On long release, ignore
     } else if (M5.BtnB.wasReleased()) {
-        bool wasButtonBLongPressHandled = buttonBLongPressHandled;
-        buttonBLongPressHandled = false;
-        if (wasButtonBLongPressHandled) return;
+        if (!altButtonEventActive) return;
+        altButtonEventActive = false;
+
+        currentViewInterface.handleAltButtonStateChange(false);
 
         uint32_t duration = M5.BtnB.lastChange() - buttonBPressStart;
         if (duration <= 1000) {

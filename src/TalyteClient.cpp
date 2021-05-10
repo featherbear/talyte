@@ -99,3 +99,7 @@ void TalyteClient::set_change_event_handler(enum ChangeEventType type, ChangeEve
     if (type & ChangeEventType::Program) _programChangeEventHandler = handler;
     if (type & ChangeEventType::Preview) _previewChangeEventHandler = handler;
 }
+
+void TalyteClient::setLinkedProgram(String programName) {
+    State.linkedProgram = programName;
+}

@@ -30,6 +30,7 @@ class TalyteClient {
     void connect(String host, unsigned short port);
     TalyteState State;
     void set_change_event_handler(enum ChangeEventType type, ChangeEventHandler handler);
+    void setLinkedProgram(String programName);
 };
 
 #endif

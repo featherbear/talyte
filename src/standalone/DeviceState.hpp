@@ -24,6 +24,7 @@ struct DeviceState {
         // Use: GetBatVoltage()
         return floor(100.0 * ((M5.Axp.GetBatVoltage() - 3.0) / (4.07 - 3.0)));
     };
+    TalyteClient *talyteClient;
     struct TalyteState *talyte;
 };
 

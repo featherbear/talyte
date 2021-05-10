@@ -14,10 +14,7 @@ TalyteClient Talyte;
 void setup() {
     Device::setup(ssid, password);
     Device::link_talyte_instance(&Talyte);
-    String s;
-    
 
-    // TODO: Info page - SSID, Server IP, Battery, charging
     // TODO: Shutdown procedure
 
     // event handler
@@ -25,10 +22,8 @@ void setup() {
         Device::refreshScreen();
     });
 
+    // TODO: Wait for Websocket connect???
     Talyte.connect(OBS_HOST, OBS_PORT);
-
-    // TODO: Connecting screen
-    Serial.println("Go to info");
     Device::setView(View::INFO);
 }
 

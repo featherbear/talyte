@@ -12,6 +12,7 @@ enum Pages {
 
 static enum Pages currentPage = Pages::OBS;
 static TalyteState *talyteState;
+static bool linkButtonPressed = false;
 
 void drawOBS() {
     // Program
@@ -45,6 +46,19 @@ void drawNetwork() {
 }
 
 void drawAssign() {
+    M5.Lcd.println("Assigned program:\n" + Spill("> " + NA_ifEmpty(talyteState->linkedProgram)));
+
+    // Linked <> Program
+    if (!(talyteState->linkedProgram.equalsConstantTime(talyteState->currentProgram))) {
+        M5.Lcd.println("Current program:");
+        M5.Lcd.println(Spill("> " + NA_ifEmpty(talyteState->currentProgram)));
+        M5.Lcd.println("\nHold button (6s) to link..");
+
+        M5.Lcd.print("           ");  // Aligned with the LCD and button
+        if (linkButtonPressed) M5.Lcd.setTextColor(BLACK, WHITE);
+        M5.Lcd.println("vvvv Link");
+        if (linkButtonPressed) M5.Lcd.setTextColor(WHITE, BLACK);
+    }
 }
 
 namespace ViewInterfaces {
@@ -87,9 +101,16 @@ ViewInterface Info = {
                     break;
            }
 
-           Device::refreshScreen();
+            // Long press
+        } else if (currentPage == Pages::Assign) {
+            Device::State.talyteClient->setLinkedProgram(talyteState->currentProgram);
         }
-        
-        Serial.println(longPress ? "Alt long press on info" : "Alt press on info"); },
-    .resetState = []() {}};
+
+        Device::refreshScreen(); },
+    .handleAltButtonStateChange = [](bool isPressed) {
+        // Only handle button press for the assign page GUI
+        if (currentPage != Pages::Assign) return;
+        linkButtonPressed = isPressed;
+        Device::refreshScreen(); },
+    .resetState = []() { currentPage = Pages::OBS; linkButtonPressed = false; }};
 }  // namespace ViewInterfaces
