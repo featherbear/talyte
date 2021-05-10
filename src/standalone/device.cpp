@@ -5,7 +5,8 @@
 namespace Device {
 
 struct DeviceState State = {
-    .currentView = View::CONNECTING};
+    .currentView = View::CONNECTING
+};
 
 bool altButtonEventActive = false;
 
