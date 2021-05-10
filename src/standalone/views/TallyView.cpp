@@ -17,10 +17,10 @@ ViewInterface Tally = {
         bool programLinked = !(talyteState->linkedProgram.isEmpty());
 
         if (programLinked) {
-            if (talyteState->linkedProgram == talyteState->currentProgram) {
+            if (talyteState->linkedProgram.equalsConstantTime(talyteState->currentProgram)) {
                 M5.Lcd.fillScreen(RED);
                 return;
-            } else if (talyteState->linkedProgram == talyteState->currentPreview) {
+            } else if (talyteState->linkedProgram.equalsConstantTime(talyteState->currentPreview)) {
                 M5.Lcd.fillScreen(GREEN);
                 return;
             }
