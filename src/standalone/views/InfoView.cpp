@@ -78,6 +78,8 @@ void drawAssign() {
 namespace ViewInterfaces {
 ViewInterface Info = {
     .handleDraw = []() {
+            Device::resetScreen();
+
             talyteState = Device::State.talyte;
             char titleBuff[26];
             snprintf(titleBuff, sizeof(titleBuff), "Info      %hhu/%hhu", (uint8_t) currentPage + 1, N_PAGES);

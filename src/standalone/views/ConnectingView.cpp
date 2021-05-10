@@ -9,6 +9,8 @@ static TalyteClient *talyteClient;
 namespace ViewInterfaces {
 ViewInterface Connecting = {
     .handleDraw = []() {
+        Device::resetScreen();
+        
         talyteState = Device::State.talyte;
         talyteClient = Device::State.talyteClient;
 

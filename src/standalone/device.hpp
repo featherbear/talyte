@@ -15,7 +15,7 @@ void setup(const char* ssid, const char* password);
 void link_talyte_instance(TalyteClient* client);
 
 void setView(enum View view);
-void refreshScreen(bool force = false);
+void refreshScreen();
 void resetScreen();
 
 void loop();

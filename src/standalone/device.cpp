@@ -31,14 +31,14 @@ void setup(const char* ssid, const char* password) {
     WifiUtils::initWiFi(ssid, password);
     Serial.println("> WiFi module initialised");
 
-    refreshScreen(true);  // Show the (Connecting) screen
+    refreshScreen();  // Show the (Connecting) screen
 
     WifiUtils::waitForConnect();
     Serial.println("> Connected to " + WifiUtils::getSSID() +
                    "\n  IP address: " + WifiUtils::getIPAddress() +
                    "\n  Hostname: " + WifiUtils::getHostname());
 
-    refreshScreen(true);
+    refreshScreen();
 }
 
 void link_talyte_instance(TalyteClient* client) {
@@ -65,7 +65,7 @@ void setView(enum View view) {
     // Otherwise you can hold Alt
     // and press M5 then release Alt
     altButtonEventActive = false;
-    refreshScreen(true);
+    refreshScreen();
 }
 
 void resetScreen() {
@@ -74,9 +74,7 @@ void resetScreen() {
     M5.Lcd.setCursor(0, 0);
 }
 
-void refreshScreen(bool force) {
-    // TODO: check for force
-    resetScreen();
+void refreshScreen() {
     currentViewInterface.handleDraw();
 }
 
