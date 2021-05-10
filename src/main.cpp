@@ -26,7 +26,7 @@ Serial.println("Start OBS");
     Talyte.waitForConnect();
 
     Device::refreshScreen();
-    delay(4000);
+    delay(3000);
 
     Device::setView(View::INFO);
 }
