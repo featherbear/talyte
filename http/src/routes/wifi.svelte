@@ -36,7 +36,7 @@
       };
     }
 
-    fetch("", {
+    fetch("/edit/wifi", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
