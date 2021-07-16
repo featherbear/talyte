@@ -1,4 +1,5 @@
 #include "wifi.hpp"
+#include "wifi_configurator.hpp"
 
 #include <ArduinoJson.h>
 
@@ -39,7 +40,7 @@ void initWiFi(
     WiFi.begin(ssid, password);
 }
 
-String discovery() {
+String discoverNetworks() {
     // If already scanning, ignore
     if (isScanning) return lastScanResult;
 
@@ -47,6 +48,7 @@ String discovery() {
     if (millis() - lastScanFinishedTime < 5000) return lastScanResult;
 
     isScanning = true;
+    Serial.println("Starting scan");
 
     int n_networks = WiFi.scanNetworks();
     Serial.printf("Found %d networks\n", n_networks);
@@ -74,28 +76,13 @@ String discovery() {
     return lastScanResult;
 }
 
-void startConfigurator() {
-    WiFi.disconnect();
-    WiFi.mode(WIFI_AP_STA);
-
-    WiFi.softAP(WiFi.getHostname());
-    IPAddress IP = WiFi.softAPIP();
-    Serial.print("AP IP address: ");
-    Serial.println(IP);
-
-    Serial.println(discovery());
-    while (true) {
-        delay(1000);
-    }
-}
-
 void waitForConnect() {
     waitForConnect(NULL);
 }
 void waitForConnect(bool (*interrupt)()) {
     while (!isConnected()) {
         if (interrupt && interrupt()) {
-            startConfigurator();
+            WifiUtils::Configurator::startConfigurator();
         }
         delay(1000);
     }

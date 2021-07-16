@@ -10,5 +10,7 @@ void initWiFi(const char* ssid, const char* password);
 void waitForConnect();
 void waitForConnect(bool (*)());
 
+String discoverNetworks();
+
 bool isConnected();
 }  // namespace WifiUtils
