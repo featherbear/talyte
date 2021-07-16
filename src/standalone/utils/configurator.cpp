@@ -47,7 +47,7 @@ static void setWifiIPMode(bool isDHCP, const char* ip, const char* mask) {
 }
 
 static void setTallyPreferences(const char* host, unsigned short port, const char* defaultProgram) {
-    tallyPreferences.begin(NVR_KEY_TALLY, true);
+    tallyPreferences.begin(NVR_KEY_TALLY, false);
 
     tallyPreferences.putString("tally_host", host);
     tallyPreferences.putUShort("tally_port", port);
@@ -127,6 +127,10 @@ void startConfigurator() {
                             server->arg(F("tally_program")).c_str());
 
         server->send(200);
+        Serial.println("Changes made.. flushing...");
+        delay(1000);
+        server->close();
+        Serial.println("Restarting");
         ESP.restart();
     });
 
