@@ -1,3 +1,4 @@
+#include <ArduinoJson.h>
 #include <ESPmDNS.h>
 #include <FS.h>
 #include <M5StickC.h>
@@ -78,7 +79,6 @@ void startConfigurator() {
         server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
     });
 
-    // TODO: Current values
     server->on(FPSTR(WWW_PATHS::DATA_CURRENT), []() {
         if (server->method() != HTTP_GET) return server->close();
         static String response("");
@@ -88,7 +88,27 @@ void startConfigurator() {
             return;
         }
 
-        // server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
+        StaticJsonDocument<1024> doc;
+
+        {
+            wifiPreferences.begin(NVR_KEY_WIFI, true);
+            doc["ssid"] = wifiPreferences.getString("ssid");
+            doc["password"] = wifiPreferences.getString("password");
+            doc["mode"] = wifiPreferences.getBool("useDHCP", true) ? "dhcp" : "static";
+            doc["static_ip"] = wifiPreferences.getString("ip");
+            doc["static_mask"] = wifiPreferences.getString("mask");
+            wifiPreferences.end();
+        }
+        {
+            tallyPreferences.begin(NVR_KEY_TALLY, true);
+            doc["tally_host"] = tallyPreferences.getString("tally_host");
+            doc["tally_port"] = tallyPreferences.getUShort("tally_port", 4444);
+            doc["tally_program"] = tallyPreferences.getString("tally_program");
+            tallyPreferences.end();
+        }
+
+        serializeJson(doc, response);
+        server->send(200, FPSTR(CONTENT_TYPES::JSON), response);
     });
 
     server->on(FPSTR(WWW_PATHS::SET_CONFIG), []() {

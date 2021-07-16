@@ -106,202 +106,217 @@
   }
 
   import { onMount } from "svelte";
+  let ready = false;
   onMount(() => {
     doUpdateData();
-
+    fetch("/data/current")
+      .then((r) => r.json())
+      .then((j) => {
+        ssid = j["ssid"];
+        password = j["password"];
+        useStatic = j["mode"] != "dhcp";
+        staticIP = j["static_ip"];
+        staticMask = j["static_mask"];
+        tally_host = j["tally_host"];
+        tally_port = j["tally_port"];
+        tally_program = j["tally_program"];
+        ready = true;
+      });
     setInterval(() => doUpdateData(), 5000);
   });
 </script>
 
-<form>
-  <div class="label">Detected networks</div>
-  <ul id="networksList">
-    {#each networkResult as [SSID, BSSID, RSSI] (SSID)}
-      <li
-        class:is-active={ssid == SSID}
-        on:click={() => {
-          if (ssid != SSID) password = "";
-          ssid = SSID;
-        }}
-      >
-        {SSID}<subtitle>({RSSI} dBm)</subtitle>
-      </li>
-    {/each}
-  </ul>
-</form>
+{#if ready}
+  <form>
+    <div class="label">Detected networks</div>
+    <ul id="networksList">
+      {#each networkResult as [SSID, BSSID, RSSI] (SSID)}
+        <li
+          class:is-active={ssid == SSID}
+          on:click={() => {
+            if (ssid != SSID) password = "";
+            ssid = SSID;
+          }}
+        >
+          {SSID}<subtitle>({RSSI} dBm)</subtitle>
+        </li>
+      {/each}
+    </ul>
+  </form>
 
-<form>
-  <div class="field">
-    <div class="label">SSID</div>
-    <div class="control">
-      <input
-        class="input"
-        name="ssid"
-        type="text"
-        bind:value={ssid}
-        required
-        placeholder="Enter SSID"
-      />
-    </div>
-  </div>
-
-  <div class="field">
-    <div class="label">Password</div>
-    <div class="field has-addons">
-      <div class="control" style="flex: 1">
+  <form>
+    <div class="field">
+      <div class="label">SSID</div>
+      <div class="control">
         <input
-          name="password"
-          width="100%"
           class="input"
-          bind:value={password}
-          type="password"
-          placeholder="Enter password"
-          bind:this={passwordElem}
+          name="ssid"
+          type="text"
+          bind:value={ssid}
+          required
+          placeholder="Enter SSID"
         />
       </div>
-      <div class="control">
-        <div
-          on:click={() =>
-            (passwordElem.type = (showPasswordAsText = !showPasswordAsText)
-              ? "text"
-              : "password")}
-          class="button is-info"
-        >
-          <span class="icon">
-            <img
-              src={showPasswordAsText ? eye : eyeOffOutline}
-              alt="Password visibility toggle"
-            />
-          </span>
+    </div>
+
+    <div class="field">
+      <div class="label">Password</div>
+      <div class="field has-addons">
+        <div class="control" style="flex: 1">
+          <input
+            name="password"
+            width="100%"
+            class="input"
+            bind:value={password}
+            type="password"
+            placeholder="Enter password"
+            bind:this={passwordElem}
+          />
+        </div>
+        <div class="control">
+          <div
+            on:click={() =>
+              (passwordElem.type = (showPasswordAsText = !showPasswordAsText)
+                ? "text"
+                : "password")}
+            class="button is-info"
+          >
+            <span class="icon">
+              <img
+                src={showPasswordAsText ? eye : eyeOffOutline}
+                alt="Password visibility toggle"
+              />
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</form>
+  </form>
 
-<form on:submit|preventDefault>
+  <form on:submit|preventDefault>
+    <div class="field">
+      <div class="label">Select IP Configuration</div>
+      <div class="field">
+        <input
+          class="is-checkradio is-info"
+          id="IPuseDHCP"
+          type="radio"
+          name="IPuseDHCPorStatic"
+          checked={!useStatic}
+          on:change={() => (useStatic = false)}
+        />
+        <label for="IPuseDHCP">DHCP</label>
+        <input
+          class="is-checkradio is-info"
+          id="IPuseStatic"
+          type="radio"
+          name="IPuseDHCPorStatic"
+          checked={useStatic}
+          on:change={() => (useStatic = true)}
+        />
+        <label for="IPuseStatic">Static</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="field">
+        <div class="label">IP Address</div>
+        <div class="control">
+          <input
+            class="input"
+            name="static_ip"
+            type="text"
+            use:IPAddressMask
+            disabled={!useStatic}
+            bind:value={staticIP}
+            placeholder="Enter IP Address as xxx.xxx.xxx.xxx"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <div class="label">Subnet</div>
+        <div class="control">
+          <input
+            class="input"
+            name="static_subnet"
+            type="text"
+            use:IPAddressMask
+            disabled={!useStatic}
+            bind:value={staticMask}
+            placeholder="Enter subnet mask as xxx.xxx.xxx.xxx"
+          />
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <form on:submit|preventDefault>
+    <div>
+      <div class="field">
+        <div class="label">Tally Host Address</div>
+        <div class="control">
+          <input
+            class="input"
+            name="tally_host"
+            type="text"
+            bind:value={tally_host}
+            required
+            placeholder="Enter host address"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <div class="label">Tally Port Number</div>
+        <div class="control">
+          <input
+            class="input"
+            name="tally_port"
+            type="number"
+            min="1"
+            max="65535"
+            bind:value={tally_port}
+            placeholder="Enter port number"
+          />
+        </div>
+      </div>
+      <div class="field">
+        <div class="label">Default Tally Program Source</div>
+        <div class="control">
+          <input
+            class="input"
+            name="tally_program"
+            type="text"
+            bind:value={tally_program}
+            placeholder="Enter name of default tally program source"
+          />
+        </div>
+      </div>
+    </div>
+  </form>
+
   <div class="field">
-    <div class="label">Select IP Configuration</div>
-    <div class="field">
-      <input
-        class="is-checkradio is-info"
-        id="IPuseDHCP"
-        type="radio"
-        name="IPuseDHCPorStatic"
-        checked={!useStatic}
-        on:change={() => (useStatic = false)}
-      />
-      <label for="IPuseDHCP">DHCP</label>
-      <input
-        class="is-checkradio is-info"
-        id="IPuseStatic"
-        type="radio"
-        name="IPuseDHCPorStatic"
-        checked={useStatic}
-        on:change={() => (useStatic = true)}
-      />
-      <label for="IPuseStatic">Static</label>
+    <div class="field-label" />
+    <div class="control">
+      <button
+        on:click={doSave}
+        class="button is-info"
+        class:is-loading={isSubmitting}>Save and Restart</button
+      >
     </div>
   </div>
 
-  <div>
-    <div class="field">
-      <div class="label">IP Address</div>
-      <div class="control">
-        <input
-          class="input"
-          name="static_ip"
-          type="text"
-          use:IPAddressMask
-          disabled={!useStatic}
-          bind:value={staticIP}
-          placeholder="Enter IP Address as xxx.xxx.xxx.xxx"
-        />
-      </div>
-    </div>
-    <div class="field">
-      <div class="label">Subnet</div>
-      <div class="control">
-        <input
-          class="input"
-          name="static_subnet"
-          type="text"
-          use:IPAddressMask
-          disabled={!useStatic}
-          bind:value={staticMask}
-          placeholder="Enter subnet mask as xxx.xxx.xxx.xxx"
-        />
-      </div>
+  <div bind:this={successModalElem} class="modal">
+    <div class="modal-background" />
+    <div class="modal-content">
+      <article class="message is-info">
+        <div class="message-body">
+          <p>Settings have been saved!</p>
+          <p>Please wait for the device to restart. Attempting to reload the page in {countdownTimer}s</p>
+        </div>
+      </article>
     </div>
   </div>
-</form>
-
-<form on:submit|preventDefault>
-  <div>
-    <div class="field">
-      <div class="label">Tally Host Address</div>
-      <div class="control">
-        <input
-          class="input"
-          name="tally_host"
-          type="text"
-          bind:value={tally_host}
-          required
-          placeholder="Enter host address"
-        />
-      </div>
-    </div>
-    <div class="field">
-      <div class="label">Tally Port Number</div>
-      <div class="control">
-        <input
-          class="input"
-          name="tally_port"
-          type="number"
-          min="1"
-          max="65535"
-          bind:value={tally_port}
-          placeholder="Enter port number"
-        />
-      </div>
-    </div>
-    <div class="field">
-      <div class="label">Default Tally Program Source</div>
-      <div class="control">
-        <input
-          class="input"
-          name="tally_program"
-          type="text"
-          bind:value={tally_program}
-          placeholder="Enter name of default tally program source"
-        />
-      </div>
-    </div>
-  </div>
-</form>
-
-<div class="field">
-  <div class="field-label" />
-  <div class="control">
-    <button
-      on:click={doSave}
-      class="button is-info"
-      class:is-loading={isSubmitting}>Save and Restart</button
-    >
-  </div>
-</div>
-
-<div bind:this={successModalElem} class="modal">
-  <div class="modal-background" />
-  <div class="modal-content">
-    <article class="message is-info">
-      <div class="message-body">
-        <p>Settings have been saved!</p>
-        Please for the device to restart. Attempting to reload the page in {countdownTimer}s
-      </div>
-    </article>
-  </div>
-</div>
+{/if}
 
 <style lang="scss">
   form {
