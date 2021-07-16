@@ -49,9 +49,11 @@
     });
   }
 
-  let networkResult: Array<[string, string, number]> = [];
-  let networkRequest_fetchPromise: Promise<Array<[string, string, number]>>;
+  type NetworkResult = Array<[string, string, number]>;
+  let networkResult: NetworkResult = [];
+  let networkRequest_fetchPromise: Promise<NetworkResult>;
   import { onMount } from "svelte";
+
   async function doUpdateData() {
     if (networkRequest_fetchPromise) return;
 
