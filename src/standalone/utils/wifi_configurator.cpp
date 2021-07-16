@@ -1,3 +1,4 @@
+#include <ESPmDNS.h>
 #include <WebServer.h>
 
 #include "wifi.hpp"
@@ -18,6 +19,12 @@ void startConfigurator() {
     IPAddress IP = WiFi.softAPIP();
     Serial.print("AP IP address: ");
     Serial.println(IP);
+
+    if (MDNS.begin(WiFi.getHostname())) {
+        Serial.println("mDNS responder started");
+    } else {
+        Serial.println("Error setting up MDNS responder!");
+    }
 
     server = std::unique_ptr<WebServer>(new WebServer(80));
 
