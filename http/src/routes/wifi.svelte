@@ -34,16 +34,17 @@
       };
     }
 
+    const body = new URLSearchParams();
+    for (let [key, val] of Object.entries({
+      ssid,
+      password,
+      ...ipData,
+    }))
+      body.append(key, val);
+
     fetch("/edit/wifi", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ssid,
-        password,
-        ...ipData,
-      }),
+      body,
     })
       .then((r) => {
         successModalElem.classList.add("is-active");
