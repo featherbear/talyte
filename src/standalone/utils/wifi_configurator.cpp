@@ -21,10 +21,13 @@ void startConfigurator() {
 
     server = std::unique_ptr<WebServer>(new WebServer(80));
 
-    server->on(String(FPSTR(PATH_ROOT)).c_str(), []() {
-        server->send(200, FPSTR(HTTP_HEAD_CT), String(":)"));
+    server->on(String(FPSTR(WWW_PATHS::ROOT)).c_str(), []() {
+        server->send(200, FPSTR(CONTENT_TYPES::HTML), String(":)"));
     });
-    
+    server->on(String(FPSTR(WWW_PATHS::DATA_NETWORKS)).c_str(), []() {
+        server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
+    });
+
     server->begin();  // Web server start
     Serial.println("Web server listening");
 
