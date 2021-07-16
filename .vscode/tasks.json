@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "export",
+      "problemMatcher": ["$platformio"],
+      "options": {
+        "cwd": "${workspaceFolder}/http"
+      },
+      "label": "Sapper | Build static site"
+    },
+    {
+      "type": "process",
+      "windows": {
+        "command": "${env:USERPROFILE}/.platformio/penv/Scripts/pio.exe"
+      },
+      "linux": {
+        "command": "platformio"
+      },
+      "args": ["run", "-t", "buildfs"],
+      "problemMatcher": ["$platformio"],
+      "label": "PlatformIO | Bundle FS"
+    },
+    {
+      "label": "Sapper + PlatformIO | Build and Bundle FS",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Sapper | Build static site", "PlatformIO | Bundle FS"],
+      "problemMatcher": ["$platformio"]
+    }
+  ]
+}
