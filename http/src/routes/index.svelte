@@ -16,7 +16,7 @@
 
   let tally_host = "";
   let tally_port = 4444;
-  let tally_default = "";
+  let tally_program = "";
 
   import { eyeOffOutline, eye } from "ionicons/icons/index";
   import "bulma-checkradio";
@@ -44,7 +44,7 @@
       password,
       tally_host,
       tally_port,
-      tally_default,
+      tally_program,
       ...ipData,
     }))
       body.append(key, val.toString());
@@ -272,7 +272,7 @@
           class="input"
           name="tally_program"
           type="text"
-          bind:value={tally_default}
+          bind:value={tally_program}
           placeholder="Enter name of default tally program source"
         />
       </div>

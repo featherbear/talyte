@@ -6,13 +6,13 @@
 
 std::unique_ptr<TalyteClient> Talyte = NULL;
 
-static Preferences preferences;
+static Preferences tally_preferences;
 void setup() {
-    preferences.begin("talyte-config", true);
-    String tally_host = preferences.getString("tally_host");
-    unsigned short tally_port = preferences.getUShort("tally_port", 4444);
-    String tally_program = preferences.getString("tally_program");
-    preferences.end();
+    tally_preferences.begin(NVR_KEY_TALLY, true);
+    String tally_host = tally_preferences.getString("tally_host");
+    unsigned short tally_port = tally_preferences.getUShort("tally_port", 4444);
+    String tally_program = tally_preferences.getString("tally_program");
+    tally_preferences.end();
 
     Talyte = std::unique_ptr<TalyteClient>(new TalyteClient(tally_host, tally_port));
 

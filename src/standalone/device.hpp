@@ -8,6 +8,9 @@
 #include "DeviceState.hpp"
 #include "utils/configurator.hpp"
 
+#define NVR_KEY_WIFI "talyte-wifi"
+#define NVR_KEY_TALLY "talyte-config"
+
 namespace Device {
 
 extern struct DeviceState State;

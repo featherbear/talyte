@@ -14,9 +14,4 @@ String discoverNetworks();
 
 bool isConnected();
 
-void setWifiAuth(const char* ssid, const char* password);
-
-void setWifiIPMode(bool isDHCP);
-void setWifiIPMode(bool isDHCP, const char* ip, const char* mask);
-
 }  // namespace WifiUtils

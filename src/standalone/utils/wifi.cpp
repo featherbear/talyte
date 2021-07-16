@@ -35,32 +35,12 @@ String getSSID() {
     return WiFi.SSID();
 }
 
-void setWifiAuth(const char* ssid, const char* password) {
-    preferences.begin("talyte-wifi", false);
-    preferences.putString("ssid", ssid);
-    preferences.putString("password", password);
-    preferences.end();
-}
-
-void setWifiIPMode(bool isDHCP) {
-    setWifiIPMode(isDHCP, NULL, NULL);
-}
-void setWifiIPMode(bool isDHCP, const char* ip, const char* mask) {
-    preferences.begin("talyte-wifi", false);
-    preferences.putBool("useDHCP", isDHCP);
-    if (!isDHCP) {
-        preferences.putString("ip", ip);
-        preferences.putString("mask", mask);
-    }
-    preferences.end();
-}
-
 void initWiFi() {
     WiFi.onEvent(WiFiStationDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);
     WiFi.mode(WIFI_STA);
     WiFi.setHostname(("Talyte-" + getMACPrefix()).c_str());
 
-    preferences.begin("talyte-wifi", true);
+    preferences.begin(NVR_KEY_WIFI, true);
     String ssid = preferences.getString("ssid");
     String password = preferences.getString("password");
 

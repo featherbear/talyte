@@ -17,6 +17,44 @@ static std::unique_ptr<WebServer> server = NULL;
 
 static String getContentType(String filename);
 
+static void setWifiAuth(const char* ssid, const char* password);
+static void setWifiIPMode(bool isDHCP);
+static void setWifiIPMode(bool isDHCP, const char* ip, const char* mask);
+static void setTallyPreferences(const char* host, unsigned short port, const char* defaultProgram);
+
+Preferences wifiPreferences;
+Preferences tallyPreferences;
+
+static void setWifiAuth(const char* ssid, const char* password) {
+    wifiPreferences.begin(NVR_KEY_WIFI, false);
+    wifiPreferences.putString("ssid", ssid);
+    wifiPreferences.putString("password", password);
+    wifiPreferences.end();
+}
+
+static void setWifiIPMode(bool isDHCP) {
+    setWifiIPMode(isDHCP, NULL, NULL);
+}
+static void setWifiIPMode(bool isDHCP, const char* ip, const char* mask) {
+    wifiPreferences.begin(NVR_KEY_WIFI, false);
+    wifiPreferences.putBool("useDHCP", isDHCP);
+    if (!isDHCP) {
+        wifiPreferences.putString("ip", ip);
+        wifiPreferences.putString("mask", mask);
+    }
+    wifiPreferences.end();
+}
+
+static void setTallyPreferences(const char* host, unsigned short port, const char* defaultProgram) {
+    tallyPreferences.begin(NVR_KEY_TALLY, true);
+
+    tallyPreferences.putString("tally_host", host);
+    tallyPreferences.putUShort("tally_port", port);
+    tallyPreferences.putString("tally_program", defaultProgram);
+
+    tallyPreferences.end();
+}
+
 void startConfigurator() {
     WiFi.disconnect();
     WiFi.mode(WIFI_AP_STA);
@@ -43,26 +81,30 @@ void startConfigurator() {
     // TODO: Current values
     server->on(FPSTR(WWW_PATHS::DATA_CURRENT), []() {
         if (server->method() != HTTP_GET) return server->close();
+        static String response("");
+
+        if (!response.isEmpty()) {
+            server->send(200, FPSTR(CONTENT_TYPES::JSON), response);
+            return;
+        }
+
         // server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
     });
 
     server->on(FPSTR(WWW_PATHS::SET_CONFIG), []() {
         if (server->method() != HTTP_POST) return server->close();
 
-        WifiUtils::setWifiAuth(
+        setWifiAuth(
             server->arg(F("ssid")).c_str(),
             server->arg(F("password")).c_str());
 
-        WifiUtils::setWifiIPMode(server->arg(F("mode")).equals("dhcp"),
-                                 server->arg(F("static_ip")).c_str(),
-                                 server->arg(F("static_mask")).c_str());
+        setWifiIPMode(server->arg(F("mode")).equals("dhcp"),
+                      server->arg(F("static_ip")).c_str(),
+                      server->arg(F("static_mask")).c_str());
 
-        Preferences preferences;
-        preferences.begin("talyte-config", false);
-        preferences.putString("tally_host", server->arg(F("tally_host")).c_str());
-        preferences.putShort("tally_port", server->arg(F("tally_port")).toInt());
-        preferences.putString("tally_program", server->arg(F("tally_program")).c_str());
-        preferences.end();
+        setTallyPreferences(server->arg(F("tally_host")).c_str(),
+                            server->arg(F("tally_port")).toInt(),
+                            server->arg(F("tally_program")).c_str());
 
         server->send(200);
         ESP.restart();
