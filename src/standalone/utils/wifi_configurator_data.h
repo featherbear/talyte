@@ -3,6 +3,8 @@
 namespace WWW_PATHS {
 const char ROOT[] PROGMEM = "/";
 const char DATA_NETWORKS[] PROGMEM = "/data/networks";
+const char SET_WIFI[] PROGMEM = "/edit/wifi";
+const char SET_TALLY[] PROGMEM = "/edit/tally";
 }  // namespace WWW_PATHS
 
 namespace CONTENT_TYPES {
