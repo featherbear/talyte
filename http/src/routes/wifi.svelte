@@ -22,17 +22,15 @@
   function doSave() {
     isSubmitting = true;
 
-    let ipData: { mode: string; [k: string]: any } = {
+    let ipData: { mode: string; static_ip?: string; static_mask?: string } = {
       mode: "dhcp", // Default
     };
 
     if (useStatic) {
       ipData = {
         mode: "static",
-        staticConfig: {
-          ip: staticIP,
-          mask: staticMask,
-        },
+        static_ip: staticIP,
+        static_mask: staticMask,
       };
     }
 
@@ -42,10 +40,8 @@
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        networkConfig: {
-          ssid,
-          password,
-        },
+        ssid,
+        password,
         ...ipData,
       }),
     })
