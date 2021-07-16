@@ -24,9 +24,9 @@ void startConfigurator() {
     WiFi.softAP(WiFi.getHostname());
     IPAddress IP = WiFi.softAPIP();
 
-    Serial.print("Starting configurator.");
+    Serial.println("Starting configurator.");
     Serial.printf("SSID: %s\n", WiFi.getHostname());
-    Serial.printf("IP address: %s\n", IP.toString());
+    Serial.printf("IP address: %s\n", IP.toString().c_str());
 
     if (!MDNS.begin(WiFi.getHostname())) {
         Serial.println("Error setting up MDNS responder!");
@@ -76,7 +76,6 @@ void startConfigurator() {
     });
 
     server->begin();
-    Serial.println("Web server listening");
 
     WifiUtils::discoverNetworks();
     Device::setView(View::SETUP);
