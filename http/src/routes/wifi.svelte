@@ -243,7 +243,7 @@
   </div>
 </div>
 
-<div bind:this={successModalElem} class="modal is-active">
+<div bind:this={successModalElem} class="modal">
   <div class="modal-background" />
   <div class="modal-content">
     <article class="message is-info">
