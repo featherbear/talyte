@@ -32,8 +32,25 @@ void startConfigurator() {
 
     server = std::unique_ptr<WebServer>(new WebServer(80));
 
-    server->on(String(FPSTR(WWW_PATHS::DATA_NETWORKS)).c_str(), []() {
+    server->on(FPSTR(WWW_PATHS::DATA_NETWORKS), []() {
+        if (server->method() != HTTP_GET) return server->close();
+
         server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
+    });
+
+    server->on(FPSTR(WWW_PATHS::SET_WIFI), []() {
+        if (server->method() != HTTP_POST) return server->close();
+
+        WifiUtils::setWifiAuth(
+            server->arg(F("ssid")).c_str(),
+            server->arg(F("password")).c_str());
+
+        WifiUtils::setWifiIPMode(server->arg(F("mode")).equals("dhcp"),
+                                 server->arg(F("static_ip")).c_str(),
+                                 server->arg(F("static_mask")).c_str());
+
+        server->send(200);
+        ESP.restart();
     });
 
     SPIFFS.begin();
@@ -52,14 +69,14 @@ void startConfigurator() {
         }
 
         File file = SPIFFS.open(path, "r");
-        size_t sent = server->streamFile(file, getContentType(path));
+        server->streamFile(file, getContentType(path));
         file.close();
     });
 
     server->begin();
     Serial.println("Web server listening");
 
-    Serial.println(WifiUtils::discoverNetworks());
+    WifiUtils::discoverNetworks();
     while (true) loop();
 }
 

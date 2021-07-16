@@ -13,7 +13,7 @@ bool altButtonEventActive = false;
 // Functions to draw
 ViewInterface currentViewInterface = ViewInterfaces::Connecting;
 
-void setup(const char* ssid, const char* password) {
+void setup() {
     setCpuFrequencyMhz(80);  // Save power - reduce CPU clock
     btStop();                // Save power - disable Bluetooth
     Serial.begin(9600);
@@ -28,8 +28,7 @@ void setup(const char* ssid, const char* password) {
     M5.Lcd.setRotation(3);
     Serial.println("> LCD module initialised");
 
-    State.network.requestedSSID = ssid;
-    WifiUtils::initWiFi(ssid, password);
+    WifiUtils::initWiFi();
     Serial.println("> WiFi module initialised");
 
     refreshScreen();  // Show the (Connecting) screen

@@ -1,11 +1,13 @@
 #include "wifi.hpp"
 
 #include <ArduinoJson.h>
+#include <Preferences.h>
 
 #include "wifi_configurator.hpp"
 
 namespace WifiUtils {
 
+static Preferences preferences;
 String lastScanResult = "[]";
 uint32_t lastScanFinishedTime = 0;
 
@@ -32,12 +34,44 @@ String getSSID() {
     return WiFi.SSID();
 }
 
-void initWiFi(
-    const char* ssid, const char* password) {
+void setWifiAuth(const char* ssid, const char* password) {
+    preferences.begin("talyte-wifi", false);
+    preferences.putString("ssid", ssid);
+    preferences.putString("password", password);
+    preferences.end();
+}
+
+void setWifiIPMode(bool isDHCP) {
+    setWifiIPMode(isDHCP, NULL, NULL);
+}
+void setWifiIPMode(bool isDHCP, const char* ip, const char* mask) {
+    preferences.begin("talyte-wifi", false);
+    preferences.putBool("useDHCP", isDHCP);
+    if (!isDHCP) {
+        preferences.putString("ip", ip);
+        preferences.putString("mask", mask);
+    }
+    preferences.end();
+}
+
+void initWiFi() {
     WiFi.onEvent(WiFiStationDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);
     WiFi.mode(WIFI_STA);
     WiFi.setHostname(("Talyte-" + getMACPrefix()).c_str());
-    WiFi.begin(ssid, password);
+
+    preferences.begin("talyte-wifi", true);
+    String ssid = preferences.getString("ssid");
+    String password = preferences.getString("password");
+
+    if (ssid.isEmpty() || (!preferences.getBool("useDHCP", true) && (preferences.getString("ip").isEmpty() || preferences.getString("mask").isEmpty()))) {
+        Serial.println("Required WiFi configuration options not set. Starting configurator...");
+        preferences.end();
+        WifiUtils::Configurator::startConfigurator();
+    } else {
+        preferences.end();
+    }
+    
+    WiFi.begin(ssid.c_str(), password.isEmpty() ? NULL : password.c_str());
 }
 
 String discoverNetworks() {
