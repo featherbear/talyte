@@ -1,8 +1,10 @@
 <script lang="ts">
   let showPasswordAsText = false;
   let useStatic = false;
+  let countdownTimer = 60;
 
   let passwordElem;
+  let successModalElem;
 
   let isSubmitting = false;
 
@@ -46,7 +48,19 @@
         },
         ...ipData,
       }),
-    });
+    })
+      .then((r) => {
+        successModalElem.classList.add("is-active");
+        let interval = setInterval(() => {
+          if (--countdownTimer == 0) {
+            clearInterval(interval);
+            window.location.reload();
+          }
+        }, 1000);
+      })
+      .finally(() => {
+        isSubmitting = false;
+      });
   }
 
   type NetworkResult = Array<[string, string | string[], number]>;
@@ -229,6 +243,17 @@
   </div>
 </div>
 
+<div bind:this={successModalElem} class="modal is-active">
+  <div class="modal-background" />
+  <div class="modal-content">
+    <article class="message is-info">
+      <div class="message-body">
+        <p>Settings have been saved!</p>
+        Please for the device to restart. Attempting to reload the page in {countdownTimer}s
+      </div>
+    </article>
+  </div>
+</div>
 
 <style lang="scss">
   form {
@@ -244,7 +269,9 @@
 
     transition: background-color 0.5s;
     padding: 5px;
-    
+
+    background-color: hsl(0, 0%, 98%);
+
     &:not(:last-child) {
       margin-bottom: 5px;
     }
