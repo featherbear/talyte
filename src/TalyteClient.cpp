@@ -1,4 +1,4 @@
-#define TALYTE_VERSION "0.1"
+#define TALYTE_VERSION "0.2"
 
 #include "TalyteClient.hpp"
 
