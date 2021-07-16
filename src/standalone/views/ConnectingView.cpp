@@ -27,7 +27,7 @@ ViewInterface Connecting = {
             M5.Lcd.setTextColor(WHITE);
         } else {
             M5.Lcd.println("Connecting to network...");
-            M5.Lcd.println(Spill(String("> ") + Device::State.network.requestedSSID));
+            M5.Lcd.println(Spill(String("> ") + Device::State.network.SSID()));
         }
         M5.Lcd.println("");
         
@@ -39,7 +39,7 @@ ViewInterface Connecting = {
                 M5.Lcd.setTextColor(WHITE);
             } else {
                 M5.Lcd.println("Connecting to OBS...");
-                M5.Lcd.println(Spill(String("> ") + talyteState->network.host + ":" + String(talyteState->network.port)));
+                M5.Lcd.println(Spill(String("> ") + (talyteState->network.host.isEmpty() ? "0.0.0.0" : talyteState->network.host) + ":" + String(talyteState->network.port)));
             }
         }
         

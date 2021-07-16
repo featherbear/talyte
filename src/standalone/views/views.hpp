@@ -4,7 +4,8 @@
 enum View {
     TALLY,
     INFO,
-    CONNECTING
+    CONNECTING,
+    SETUP
 };
 
 struct ViewInterface {
@@ -27,5 +28,6 @@ namespace ViewInterfaces {
 extern ViewInterface Tally;
 extern ViewInterface Info;
 extern ViewInterface Connecting;
+extern ViewInterface Setup;
 }  // namespace ViewInterfaces
 #endif

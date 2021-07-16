@@ -13,7 +13,7 @@ bool altButtonEventActive = false;
 // Functions to draw
 ViewInterface currentViewInterface = ViewInterfaces::Connecting;
 
-void setup(const char* ssid, const char* password) {
+void setup() {
     setCpuFrequencyMhz(80);  // Save power - reduce CPU clock
     btStop();                // Save power - disable Bluetooth
     Serial.begin(9600);
@@ -28,13 +28,12 @@ void setup(const char* ssid, const char* password) {
     M5.Lcd.setRotation(3);
     Serial.println("> LCD module initialised");
 
-    State.network.requestedSSID = ssid;
-    WifiUtils::initWiFi(ssid, password);
+    WifiUtils::initWiFi();
     Serial.println("> WiFi module initialised");
 
     refreshScreen();  // Show the (Connecting) screen
 
-    WifiUtils::waitForConnect();
+    WifiUtils::waitForConnect(wasBtnAPressed);
     Serial.println("> Connected to " + WifiUtils::getSSID() +
                    "\n  IP address: " + WifiUtils::getIPAddress() +
                    "\n  Hostname: " + WifiUtils::getHostname());
@@ -57,6 +56,9 @@ void setView(enum View view) {
             break;
         case CONNECTING:
             currentViewInterface = ViewInterfaces::Connecting;
+            break;
+        case SETUP:
+            currentViewInterface = ViewInterfaces::Setup;
             break;
     }
 
@@ -94,16 +96,22 @@ void switchModes() {
 
 uint32_t buttonBPressStart = 0;
 
-void loop() {
+bool wasBtnAPressed() {
     M5.BtnA.read();
+    return M5.BtnA.wasPressed();
+}
+
+void loop() {
+    // M5 button pressed
+    if (wasBtnAPressed()) {
+        switchModes();
+        return;
+    }
+
     M5.BtnB.read();
 
-    // M5 button pressed
-    if (M5.BtnA.wasPressed()) {
-        switchModes();
-
-        // Start timer
-    } else if (M5.BtnB.wasPressed()) {
+    // Start timer
+    if (M5.BtnB.wasPressed()) {
         altButtonEventActive = true;
         buttonBPressStart = M5.BtnB.lastChange();
         currentViewInterface.handleAltButtonStateChange(true);
