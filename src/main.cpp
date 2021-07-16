@@ -1,32 +1,34 @@
 #include <Arduino.h>
+#include <Preferences.h>
 
 #include "TalyteClient.hpp"
 #include "standalone/device.hpp"
 
-///////////////
+std::unique_ptr<TalyteClient> Talyte = NULL;
 
-const char* OBS_HOST = "OBS_OR_TALYTE_ASSISTANT_IP";
-const unsigned short OBS_PORT = 4444;
-
-const char* defaultProgram = "";
-
-///////////////
-
-TalyteClient Talyte(OBS_HOST, OBS_PORT);
-
+static Preferences preferences;
 void setup() {
-    // TODO: Shutdown procedure
+    preferences.begin("talyte-config", true);
+    String tally_host = preferences.getString("tally_host");
+    unsigned short tally_port = preferences.getUShort("tally_port", 4444);
+    String tally_program = preferences.getString("tally_program");
+    preferences.end();
 
-    Device::link_talyte_instance(&Talyte);
+    Talyte = std::unique_ptr<TalyteClient>(new TalyteClient(tally_host, tally_port));
+
+    Device::link_talyte_instance(Talyte.get());
     Device::setup();
 
-    Talyte.set_change_event_handler(ChangeEventType::ALL, [](String _) {
+    Talyte->set_change_event_handler(ChangeEventType::ALL, [](String _) {
         Device::refreshScreen();
     });
-    Talyte.setLinkedProgram(defaultProgram);
+    Talyte->setLinkedProgram(tally_program);
 
-    Talyte.connect();
-    Talyte.waitForConnect();
+    Talyte->connect();
+    while (!Talyte->isConnected()) {
+        Talyte->loop();
+        if (Device::wasBtnAPressed()) Configurator::startConfigurator();
+    }
 
     Device::refreshScreen();
     delay(3000);
@@ -36,5 +38,5 @@ void setup() {
 
 void loop() {
     Device::loop();
-    Talyte.loop();
+    Talyte->loop();
 }
