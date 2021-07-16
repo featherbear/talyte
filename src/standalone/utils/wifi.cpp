@@ -67,6 +67,7 @@ String discovery() {
         apArray.add(WiFi.RSSI(i));
     }
 
+    lastScanResult.clear();
     serializeJson(doc, lastScanResult);
     isScanning = false;
     lastScanFinishedTime = millis();
