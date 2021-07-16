@@ -90,12 +90,13 @@
   import { onMount } from "svelte";
   onMount(() => {
     doUpdateData();
+
     setInterval(() => doUpdateData(), 5000);
   });
 </script>
 
 <form>
-  <label class="label">Detected networks</label>
+  <div class="label">Detected networks</div>
   <ul id="networksList">
     {#each networkResult as [SSID, BSSID, RSSI] (SSID)}
       <li
@@ -113,7 +114,7 @@
 
 <form>
   <div class="field">
-    <label class="label">SSID</label>
+    <div class="label">SSID</div>
     <div class="control">
       <input
         class="input"
@@ -127,7 +128,7 @@
   </div>
 
   <div class="field">
-    <label class="label">Password</label>
+    <div class="label">Password</div>
     <div class="field has-addons">
       <div class="control" style="flex: 1">
         <input
@@ -162,13 +163,13 @@
 
 <form on:submit|preventDefault>
   <div class="field">
-    <label class="label">Select IP Configuration</label>
+    <div class="label">Select IP Configuration</div>
     <div class="field">
       <input
         class="is-checkradio is-info"
         id="IPuseDHCP"
         type="radio"
-        name="exampleRadioInline"
+        name="IPuseDHCPorStatic"
         checked={!useStatic}
         on:change={() => (useStatic = false)}
       />
@@ -187,7 +188,7 @@
 
   <div>
     <div class="field">
-      <label class="label">IP Address</label>
+      <div class="label">IP Address</div>
       <div class="control">
         <input
           class="input"
@@ -201,7 +202,7 @@
       </div>
     </div>
     <div class="field">
-      <label class="label">Subnet</label>
+      <div class="label">Subnet</div>
       <div class="control">
         <input
           class="input"
@@ -215,18 +216,19 @@
       </div>
     </div>
   </div>
-
-  <div class="field">
-    <div class="field-label" />
-    <div class="control">
-      <button
-        on:click={doSave}
-        class="button is-info"
-        class:is-loading={isSubmitting}>Submit</button
-      >
-    </div>
-  </div>
 </form>
+
+<div class="field">
+  <div class="field-label" />
+  <div class="control">
+    <button
+      on:click={doSave}
+      class="button is-info"
+      class:is-loading={isSubmitting}>Save and Restart</button
+    >
+  </div>
+</div>
+
 
 <style lang="scss">
   form {
