@@ -49,7 +49,7 @@
     });
   }
 
-  type NetworkResult = Array<[string, string, number]>;
+  type NetworkResult = Array<[string, string | string[], number]>;
   let networkResult: NetworkResult = [];
   let networkRequest_fetchPromise: Promise<NetworkResult>;
 
@@ -58,7 +58,30 @@
 
     networkRequest_fetchPromise = fetch("/data/networks")
       .then((r) => r.json())
-      .then((j) => (networkResult = j))
+      .then((j: NetworkResult) => {
+        let mapping: {
+          [ssid: string]: {
+            bssid: string[];
+            rssi: number;
+          };
+        } = {};
+
+        for (let [ssid, bssid, rssi] of j) {
+          if (!mapping.hasOwnProperty(ssid)) {
+            mapping[ssid] = { bssid: [bssid as string], rssi };
+            continue;
+          }
+
+          mapping[ssid]["bssid"].push(bssid as string);
+          if (rssi > mapping[ssid]["rssi"]) mapping[ssid]["rssi"] = rssi;
+        }
+
+        let result: NetworkResult = [];
+        for (let ssid in mapping)
+          result.push([ssid, mapping[ssid]["bssid"], mapping[ssid]["rssi"]]);
+        return result;
+      })
+      .then((d) => (networkResult = d))
       .finally(() => {
         networkRequest_fetchPromise = null;
       });
@@ -71,18 +94,22 @@
   });
 </script>
 
-<ul id="networksList">
-  {#each networkResult as [SSID, BSSID, RSSI] (BSSID)}
-    <li
-      on:click={() => {
-        if (ssid != SSID) password = "";
-        ssid = SSID;
-      }}
-    >
-      {SSID} - {BSSID} - {RSSI}
-    </li>
-  {/each}
-</ul>
+<form>
+  <label class="label">Detected networks</label>
+  <ul id="networksList">
+    {#each networkResult as [SSID, BSSID, RSSI] (SSID)}
+      <li
+        class:is-active={ssid == SSID}
+        on:click={() => {
+          if (ssid != SSID) password = "";
+          ssid = SSID;
+        }}
+      >
+        {SSID}<subtitle>({RSSI} dBm)</subtitle>
+      </li>
+    {/each}
+  </ul>
+</form>
 
 <form>
   <div class="field">
@@ -93,6 +120,7 @@
         name="ssid"
         type="text"
         bind:value={ssid}
+        required
         placeholder="Enter SSID"
       />
     </div>
@@ -211,5 +239,28 @@
 
   ul li {
     cursor: pointer;
+
+    transition: background-color 0.5s;
+    padding: 5px;
+    
+    &:not(:last-child) {
+      margin-bottom: 5px;
+    }
+    border-radius: 5px;
+
+    &.is-active {
+      background-color: #5caef1;
+      font-weight: bold;
+    }
+
+    &:not(.is-active):hover {
+      background-color: #a0c9eb;
+    }
+
+    subtitle {
+      margin-left: 5px;
+      font-size: 0.7em;
+      color: hsl(0, 0%, 41%);
+    }
   }
 </style>
