@@ -34,7 +34,7 @@ void setup(const char* ssid, const char* password) {
 
     refreshScreen();  // Show the (Connecting) screen
 
-    WifiUtils::waitForConnect();
+    WifiUtils::waitForConnect(wasBtnAPressed);
     Serial.println("> Connected to " + WifiUtils::getSSID() +
                    "\n  IP address: " + WifiUtils::getIPAddress() +
                    "\n  Hostname: " + WifiUtils::getHostname());
@@ -94,16 +94,22 @@ void switchModes() {
 
 uint32_t buttonBPressStart = 0;
 
-void loop() {
+bool wasBtnAPressed() {
     M5.BtnA.read();
+    return M5.BtnA.wasPressed();
+}
+
+void loop() {
+    // M5 button pressed
+    if (wasBtnAPressed()) {
+        switchModes();
+        return;
+    }
+
     M5.BtnB.read();
 
-    // M5 button pressed
-    if (M5.BtnA.wasPressed()) {
-        switchModes();
-
-        // Start timer
-    } else if (M5.BtnB.wasPressed()) {
+    // Start timer
+    if (M5.BtnB.wasPressed()) {
         altButtonEventActive = true;
         buttonBPressStart = M5.BtnB.lastChange();
         currentViewInterface.handleAltButtonStateChange(true);

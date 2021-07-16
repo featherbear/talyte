@@ -18,6 +18,8 @@ void setView(enum View view);
 void refreshScreen();
 void resetScreen();
 
+bool wasBtnAPressed();
+
 void loop();
 }  // namespace Device
 

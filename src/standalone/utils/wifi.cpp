@@ -33,8 +33,30 @@ void initWiFi(
     WiFi.begin(ssid, password);
 }
 
+void startConfigurator() {
+    WiFi.disconnect();
+    WiFi.mode(WIFI_AP_STA);
+
+    WiFi.softAP(WiFi.getHostname());
+    IPAddress IP = WiFi.softAPIP();
+    Serial.print("AP IP address: ");
+    Serial.println(IP);
+
+    while (true) {
+        delay(1000);
+    }
+}
+
 void waitForConnect() {
-    while (!isConnected()) delay(1000);
+    waitForConnect(NULL);
+}
+void waitForConnect(bool (*interrupt)()) {
+    while (!isConnected()) {
+        if (interrupt && interrupt()) {
+            startConfigurator();
+        }
+        delay(1000);
+    }
 }
 
 String getIPAddress() {
