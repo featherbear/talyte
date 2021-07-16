@@ -6,6 +6,7 @@
 
 #include "../TalyteClient.hpp"
 #include "DeviceState.hpp"
+#include "utils/configurator.hpp"
 
 namespace Device {
 

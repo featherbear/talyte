@@ -1,14 +1,14 @@
 #include <ESPmDNS.h>
 #include <FS.h>
 #include <M5StickC.h>
+#include <Preferences.h>
 #include <SPIFFS.h>
 #include <WebServer.h>
 
 #include "../device.hpp"
+#include "configurator_data.h"
 #include "wifi.hpp"
-#include "wifi_configurator_data.h"
 
-namespace WifiUtils {
 namespace Configurator {
 
 static void loop();
@@ -24,7 +24,7 @@ void startConfigurator() {
     WiFi.softAP(WiFi.getHostname());
     IPAddress IP = WiFi.softAPIP();
 
-    Serial.println("Starting configurator.");
+    Serial.println("Starting configurator...");
     Serial.printf("SSID: %s\n", WiFi.getHostname());
     Serial.printf("IP address: %s\n", IP.toString().c_str());
 
@@ -40,7 +40,13 @@ void startConfigurator() {
         server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
     });
 
-    server->on(FPSTR(WWW_PATHS::SET_WIFI), []() {
+    // TODO: Current values
+    server->on(FPSTR(WWW_PATHS::DATA_CURRENT), []() {
+        if (server->method() != HTTP_GET) return server->close();
+        // server->send(200, FPSTR(CONTENT_TYPES::JSON), WifiUtils::discoverNetworks());
+    });
+
+    server->on(FPSTR(WWW_PATHS::SET_CONFIG), []() {
         if (server->method() != HTTP_POST) return server->close();
 
         WifiUtils::setWifiAuth(
@@ -50,6 +56,13 @@ void startConfigurator() {
         WifiUtils::setWifiIPMode(server->arg(F("mode")).equals("dhcp"),
                                  server->arg(F("static_ip")).c_str(),
                                  server->arg(F("static_mask")).c_str());
+
+        Preferences preferences;
+        preferences.begin("talyte-config", false);
+        preferences.putString("tally_host", server->arg(F("tally_host")).c_str());
+        preferences.putShort("tally_port", server->arg(F("tally_port")).toInt());
+        preferences.putString("tally_program", server->arg(F("tally_program")).c_str());
+        preferences.end();
 
         server->send(200);
         ESP.restart();
@@ -102,4 +115,3 @@ static String getContentType(String filename) {
 }
 
 }  // namespace Configurator
-}  // namespace WifiUtils

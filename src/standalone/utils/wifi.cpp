@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
-#include "wifi_configurator.hpp"
+#include "configurator.hpp"
 
 namespace WifiUtils {
 
@@ -67,7 +67,7 @@ void initWiFi() {
     if (ssid.isEmpty() || (!preferences.getBool("useDHCP", true) && (preferences.getString("ip").isEmpty() || preferences.getString("mask").isEmpty()))) {
         Serial.println("Required WiFi configuration options not set. Starting configurator...");
         preferences.end();
-        WifiUtils::Configurator::startConfigurator();
+        Configurator::startConfigurator();
     } else {
         preferences.end();
     }
@@ -131,7 +131,7 @@ void waitForConnect() {
 void waitForConnect(bool (*interrupt)()) {
     while (!isConnected()) {
         if (interrupt && interrupt()) {
-            WifiUtils::Configurator::startConfigurator();
+            Configurator::startConfigurator();
         }
         delay(1000);
     }
