@@ -1,9 +1,9 @@
 #include "wifi.hpp"
-#include "../device.hpp"
 
 #include <ArduinoJson.h>
 #include <Preferences.h>
 
+#include "../device.hpp"
 #include "configurator.hpp"
 
 namespace WifiUtils {
@@ -43,16 +43,28 @@ void initWiFi() {
     preferences.begin(NVR_KEY_WIFI, true);
     String ssid = preferences.getString("ssid");
     String password = preferences.getString("password");
+    bool useDHCP = preferences.getBool("useDHCP", true);
 
-    if (ssid.isEmpty() || (!preferences.getBool("useDHCP", true) && (preferences.getString("ip").isEmpty() || preferences.getString("mask").isEmpty()))) {
+    if (ssid.isEmpty() || (!useDHCP && (preferences.getString("ip").isEmpty() || preferences.getString("mask").isEmpty()))) {
         Serial.println("Required WiFi configuration options not set. Starting configurator...");
         preferences.end();
         Configurator::startConfigurator();
     } else {
         preferences.end();
     }
-    
+
     Device::State.network.requestedSSID = ssid;
+
+    if (!useDHCP) {
+        IPAddress localIP;
+        localIP.fromString(preferences.getString("ip"));
+        IPAddress subnetMask;
+        subnetMask.fromString(preferences.getString("mask"));
+
+        // Ignore gateway
+        WiFi.config(localIP, localIP, subnetMask);
+    }
+
     WiFi.begin(ssid.c_str(), password.isEmpty() ? NULL : password.c_str());
 }
 
@@ -73,8 +85,8 @@ String discoverNetworks() {
 
     // 0+ networks found
 
-    Serial.println("Starting scan");
-    Serial.printf("Found %d networks\n", n_networks_or_status);
+    // Serial.println("Starting scan");
+    // Serial.printf("Found %d networks\n", n_networks_or_status);
 
     if (n_networks_or_status == 0) {
         lastScanResult = "[]";
