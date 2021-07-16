@@ -51,8 +51,7 @@
 
   type NetworkResult = Array<[string, string, number]>;
   let networkResult: NetworkResult = [];
-  let networkRequest_fetchPromise: Promise<NetworkResult>;
-  import { onMount } from "svelte";
+  let networkRequest_fetchPromise: Promise<NetworkResult>>;
 
   async function doUpdateData() {
     if (networkRequest_fetchPromise) return;
@@ -64,7 +63,8 @@
         networkRequest_fetchPromise = null;
       });
   }
-
+  
+  import { onMount } from "svelte";
   onMount(() => {
     doUpdateData();
     setInterval(() => doUpdateData(), 5000);
