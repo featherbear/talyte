@@ -1,4 +1,5 @@
 #include "wifi.hpp"
+#include "../device.hpp"
 
 #include <ArduinoJson.h>
 #include <Preferences.h>
@@ -71,6 +72,7 @@ void initWiFi() {
         preferences.end();
     }
     
+    Device::State.network.requestedSSID = ssid;
     WiFi.begin(ssid.c_str(), password.isEmpty() ? NULL : password.c_str());
 }
 

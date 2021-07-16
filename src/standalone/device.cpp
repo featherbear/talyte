@@ -57,6 +57,9 @@ void setView(enum View view) {
         case CONNECTING:
             currentViewInterface = ViewInterfaces::Connecting;
             break;
+        case SETUP:
+            currentViewInterface = ViewInterfaces::Setup;
+            break;
     }
 
     currentViewInterface.resetState();

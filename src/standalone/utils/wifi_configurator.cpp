@@ -1,8 +1,10 @@
 #include <ESPmDNS.h>
 #include <FS.h>
+#include <M5StickC.h>
 #include <SPIFFS.h>
 #include <WebServer.h>
 
+#include "../device.hpp"
 #include "wifi.hpp"
 #include "wifi_configurator_data.h"
 
@@ -77,6 +79,7 @@ void startConfigurator() {
     Serial.println("Web server listening");
 
     WifiUtils::discoverNetworks();
+    Device::setView(View::SETUP);
     while (true) loop();
 }
 
