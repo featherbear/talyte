@@ -23,12 +23,12 @@ void startConfigurator() {
 
     WiFi.softAP(WiFi.getHostname());
     IPAddress IP = WiFi.softAPIP();
-    Serial.print("AP IP address: ");
-    Serial.println(IP);
 
-    if (MDNS.begin(WiFi.getHostname())) {
-        Serial.println("mDNS responder started");
-    } else {
+    Serial.print("Starting configurator.");
+    Serial.printf("SSID: %s\n", WiFi.getHostname());
+    Serial.printf("IP address: %s\n", IP.toString());
+
+    if (!MDNS.begin(WiFi.getHostname())) {
         Serial.println("Error setting up MDNS responder!");
     }
 

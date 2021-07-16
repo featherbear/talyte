@@ -10,7 +10,7 @@ namespace WifiUtils {
 
 static Preferences preferences;
 String lastScanResult = "[]";
-uint32_t lastScanFinishedTime = 0;
+static uint32_t lastScanFinishedTime = 0;
 
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
     Serial.println("Disconnected from WiFi access point");
