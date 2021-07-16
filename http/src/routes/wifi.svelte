@@ -1,16 +1,16 @@
-<script>
+<script lang="ts">
   let showPasswordAsText = false;
   let useStatic = false;
 
+  let passwordElem;
+
   let isSubmitting = false;
 
-  let networkConfig =  {
-    ssid: '',
-    password: '',
-  }
+  let ssid = "";
+  let password = "";
 
-  let staticIP = ""
-  let staticMask = ""
+  let staticIP = "";
+  let staticMask = "";
 
   import { eyeOffOutline, eye } from "ionicons/icons/index";
   import "bulma-checkradio";
@@ -19,42 +19,80 @@
 
   function doSave() {
     isSubmitting = true;
-    
-    let ipData = {
-      mode: 'dhcp' // Default
-    }
+
+    let ipData: { mode: string; [k: string]: any } = {
+      mode: "dhcp", // Default
+    };
 
     if (useStatic) {
       ipData = {
-        mode: 'static',
+        mode: "static",
         staticConfig: {
           ip: staticIP,
           mask: staticMask,
-        }
-      }
+        },
+      };
     }
-
 
     fetch("", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        networkConfig, ...ipData
-
-      })
-    })
+        networkConfig: {
+          ssid,
+          password,
+        },
+        ...ipData,
+      }),
+    });
   }
+
+  let networkResult: Array<[string, string, number]> = [];
+  let networkRequest_fetchPromise: Promise<Array<[string, string, number]>>;
+  import { onMount } from "svelte";
+  async function doUpdateData() {
+    if (networkRequest_fetchPromise) return;
+
+    networkRequest_fetchPromise = fetch("/data/networks")
+      .then((r) => r.json())
+      .then((j) => (networkResult = j))
+      .finally(() => {
+        networkRequest_fetchPromise = null;
+      });
+  }
+
+  onMount(() => {
+    doUpdateData();
+    setInterval(() => doUpdateData(), 5000);
+  });
 </script>
 
-<ul id="networksList" />
+<ul id="networksList">
+  {#each networkResult as [SSID, BSSID, RSSI] (BSSID)}
+    <li
+      on:click={() => {
+        if (ssid != SSID) password = "";
+        ssid = SSID;
+      }}
+    >
+      {SSID} - {BSSID} - {RSSI}
+    </li>
+  {/each}
+</ul>
 
 <form>
   <div class="field">
     <label class="label">SSID</label>
     <div class="control">
-      <input class="input" name="ssid" type="text" placeholder="Enter SSID" />
+      <input
+        class="input"
+        name="ssid"
+        type="text"
+        bind:value={ssid}
+        placeholder="Enter SSID"
+      />
     </div>
   </div>
 
@@ -66,19 +104,27 @@
           name="password"
           width="100%"
           class="input"
-          type={showPasswordAsText ? "text" : "password"}
+          bind:value={password}
+          type="password"
           placeholder="Enter password"
+          bind:this={passwordElem}
         />
       </div>
       <div class="control">
-        <a
-          on:click={() => (showPasswordAsText = !showPasswordAsText)}
+        <div
+          on:click={() =>
+            (passwordElem.type = (showPasswordAsText = !showPasswordAsText)
+              ? "text"
+              : "password")}
           class="button is-info"
         >
           <span class="icon">
-            <img src={showPasswordAsText ? eye : eyeOffOutline} />
+            <img
+              src={showPasswordAsText ? eye : eyeOffOutline}
+              alt="Password visibility toggle"
+            />
           </span>
-        </a>
+        </div>
       </div>
     </div>
   </div>
@@ -143,7 +189,11 @@
   <div class="field">
     <div class="field-label" />
     <div class="control">
-      <button on:click={doSave} class="button is-info" class:is-loading={isSubmitting}>Submit</button>
+      <button
+        on:click={doSave}
+        class="button is-info"
+        class:is-loading={isSubmitting}>Submit</button
+      >
     </div>
   </div>
 </form>
@@ -155,5 +205,9 @@
     &:not(:last-child) {
       margin-bottom: 50px;
     }
+  }
+
+  ul li {
+    cursor: pointer;
   }
 </style>
