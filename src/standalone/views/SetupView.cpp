@@ -19,7 +19,7 @@ ViewInterface Setup = {
 
         // M5.Lcd.setTextColor(GREEN);
         M5.Lcd.println("SSID: " + Device::State.network.hostname());
-        M5.Lcd.println("IP: " + WiFi.softAPIP().toString());
+        M5.Lcd.println("IP  : " + WiFi.softAPIP().toString());
         M5.Lcd.println("");
         M5.Lcd.println(
             "Join the above network and"

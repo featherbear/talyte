@@ -36,9 +36,9 @@ void drawOBS() {
 
 void drawNetwork() {
     // Device WiFi
-    M5.Lcd.println(Spill(String("WiFi SSID: ") + Device::State.network.SSID()));
-    M5.Lcd.println(Spill(String("Hostname : ") + Device::State.network.hostname()));
-    M5.Lcd.println(Spill(String("Device IP: ") + Device::State.network.ipAddress()));
+    M5.Lcd.println(Spill(String("SSID: ") + Device::State.network.SSID()));
+    M5.Lcd.println(Spill(String("Host: ") + Device::State.network.hostname()));
+    M5.Lcd.println(Spill(String("IP  : ") + Device::State.network.ipAddress()));
     M5.Lcd.println("");
 
     // OBS
