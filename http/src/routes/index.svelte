@@ -127,6 +127,7 @@
 </script>
 
 {#if ready}
+  <h1 class="title has-text-centered">Talyte Config</h1>
   <form>
     <div class="label">Detected networks</div>
     <ul id="networksList">
