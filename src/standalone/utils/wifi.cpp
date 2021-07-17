@@ -24,7 +24,7 @@ void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
 String getMACPrefix() {
     String MAC = WiFi.macAddress();
     MAC.replace(":", "");
-    return MAC.substring(0, 6);
+    return MAC.substring(0, 10);
 }
 
 String getHostname() {
