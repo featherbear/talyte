@@ -126,6 +126,10 @@
   });
 </script>
 
+<svelte:head>
+  <title>Talyte Config</title>
+</svelte:head>
+
 {#if ready}
   <h1 class="title has-text-centered">Talyte Config</h1>
   <form>
