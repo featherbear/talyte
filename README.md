@@ -19,6 +19,14 @@ You can use Talyte as a standalone program, or as an API (write your own program
 
 #### Usage
 
+**Setup**
+
+Whilst the device is on the Connecting screen (during startup), press the [M5] button to enter the setup mode. The wireless network and IP address to connect to are displayed on the LCD screen.
+
+Once connected, you can configure the network and tally settings on the webpage.
+
+![](https://featherbear.cc/blog/uploads/screely-1626514386767.png)
+
 **Views**
 
 ```
